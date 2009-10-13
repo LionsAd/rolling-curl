@@ -157,33 +157,27 @@ class RollingCurl {
             // a request was just completed -- find out which one
             while($done = curl_multi_info_read($master)) {
 
+                // get the info and content returned on the request
                 $info = curl_getinfo($done['handle']);
-                if ($info['http_code'] == 200)  {
-                    $output = curl_multi_getcontent($done['handle']);
+                $output = curl_multi_getcontent($done['handle']);
 
-                    // request successful.  process output using the callback function.
-                    $callback = $this->callback;
-                    $callback($output, $info);
+                // send the return values to the callback function.
+                $callback = $this->callback;
+                $callback($output, $info);
 
-                    // start a new request (it's important to do this before removing the old one)
-                    if ($i < sizeof($requests)) {
-                        $ch = curl_init();
-                        $options = $this->get_options($this->requests[$i++]); // note the increment on i
-                    
-                        curl_setopt_array($ch,$options);
-                    
-                        curl_multi_add_handle($master, $ch);
-                    }
-
-                    // remove the curl handle that just completed
-                    curl_multi_remove_handle($master, $done['handle']);
-                } else {
-                    if ($info['url']) {
-                        // request failed.  still hit the callback so we know what happened.
-                        $callback = $this->callback;
-                        $callback(false,$info);
-                    }
+                // start a new request (it's important to do this before removing the old one)
+                if ($i < sizeof($requests)) {
+                    $ch = curl_init();
+                    $options = $this->get_options($this->requests[$i++]); // note the increment on i
+                
+                    curl_setopt_array($ch,$options);
+                
+                    curl_multi_add_handle($master, $ch);
                 }
+
+                // remove the curl handle that just completed
+                curl_multi_remove_handle($master, $done['handle']);
+              
             }
         } while ($running);
         curl_multi_close($master);
