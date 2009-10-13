@@ -166,12 +166,13 @@ class RollingCurl {
                 $callback($output, $info);
 
                 // start a new request (it's important to do this before removing the old one)
-                if ($i < sizeof($requests)) {
+                if ($i < sizeof($requests) && isset($this->requests[$i])) {
                     $ch = curl_init();
-                    $options = $this->get_options($this->requests[$i++]); // note the increment on i
-                
+                    $options = $this->get_options($this->requests[$i]); 
+                    $i++;
+            
                     curl_setopt_array($ch,$options);
-                
+            
                     curl_multi_add_handle($master, $ch);
                 }
 
