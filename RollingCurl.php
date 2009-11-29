@@ -188,8 +188,15 @@ class RollingCurl {
         // options for this entire curl object
         $options = $this->__get('options');
         $headers = $this->__get('headers');
-       
+
+		// append custom options for this specific request
+		if ($request->options) {
+            $options = $this->__get('options') + $request->options;
+        } 
+
+		// set the request URL
         $options[CURLOPT_URL] = $request->url;
+
         // posting data w/ this request?
         if ($request->post_data) {
             $options[CURLOPT_POST] = 1;
@@ -199,7 +206,7 @@ class RollingCurl {
             $options[CURLOPT_HEADER] = 0;
             $options[CURLOPT_HTTPHEADER] = $headers;
         }
-        
+
         return $options;
     }
     
