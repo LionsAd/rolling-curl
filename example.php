@@ -5,15 +5,9 @@ authored by Josh Fraser (www.joshfraser.com)
 released under Apache License 2.0
 */
 
-// silly little example that fetches a bunch of sites in parrallel and echos the MD5 of the page content
+// a little example that fetches a bunch of sites in parallel and echos the page title and response info for each request
 
 require("RollingCurl.php");
-
-// function that should process the returned content
-// pass this function name as a callback to your RC instance
-function request_callback($result) {
-    echo md5($result)."<br />";
-}
 
 // top 20 sites according to alexa (11/5/09)
 $urls = array("http://www.google.com",
@@ -36,6 +30,16 @@ $urls = array("http://www.google.com",
               "http://www.sina.com.cn",
               "http://www.wordpress.com",
               "http://www.google.co.uk");
+
+function request_callback($response, $info) {
+	// parse the page title out of the returned HTML
+	if (eregi ("<title>(.*)</title>", $response, $out)) {
+		$title = $out[1];
+	}
+	echo "<b>$title</b><br />";
+	print_r($info);
+	echo "<hr>";
+}
 
 $rc = new RollingCurl("request_callback");
 $rc->window_size = 20;
