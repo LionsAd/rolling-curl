@@ -117,7 +117,8 @@ class RollingCurl {
         // it's not neccesary to set a callback for one-off requests
         if ($this->callback) {
             $callback = $this->callback;
-            $callback($output, $info);
+            if (is_callable($this->callback))
+                $callback($output, $info);
         } else {
             return $output;
         }
@@ -163,7 +164,8 @@ class RollingCurl {
 
                 // send the return values to the callback function.
                 $callback = $this->callback;
-                $callback($output, $info);
+                if (is_callable($callback))
+                    $callback($output, $info);
 
                 // start a new request (it's important to do this before removing the old one)
                 if ($i < sizeof($this->requests) && isset($this->requests[$i]) && $i < count($this->requests)) {
