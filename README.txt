@@ -78,8 +78,30 @@ $rc->get("http://www.google.com");
 $rc->get("http://www.yahoo.com");
 $rc->execute();
 
+Example 4 - Class callbacks:
 
+class MyInfoCollector {
+    private $rc;
 
+    function __construct(){
+        $this->rc = new RollingCurl(array($this, 'processPage'));
+    }
 
+    function processPage($response, $info){
+      //...
+    }
 
+    function run($urls){
+        foreach ($urls as $url){
+            $request = new Request($url);
+            $this->rc->add($request);
+        }
+        $this->rc->execute();
+    }
+}
 
+$collector = new MyInfoCollector();
+$collector->run(array(
+    'http://google.com/',
+    'http://yahoo.com/'
+));
