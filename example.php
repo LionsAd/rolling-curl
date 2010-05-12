@@ -1,8 +1,9 @@
 <?php
-
 /*
 authored by Josh Fraser (www.joshfraser.com)
 released under Apache License 2.0
+
+Maintained by Alexander Makarov, http://rmcreative.ru/
 */
 
 // a little example that fetches a bunch of sites in parallel and echos the page title and response info for each request
@@ -33,7 +34,7 @@ $urls = array("http://www.google.com",
 
 function request_callback($response, $info) {
 	// parse the page title out of the returned HTML
-	if (eregi ("<title>(.*)</title>", $response, $out)) {
+	if (preg_match("~<title>(.*?)</title>~i", $response, $out)) {
 		$title = $out[1];
 	}
 	echo "<b>$title</b><br />";
@@ -48,5 +49,3 @@ foreach ($urls as $url) {
     $rc->add($request);
 }
 $rc->execute();
-
-?>

@@ -2,6 +2,8 @@
 /*
 Authored by Josh Fraser (www.joshfraser.com)
 Released under Apache License 2.0
+
+Maintained by Alexander Makarov, http://rmcreative.ru/
 */
 
 /**
@@ -93,9 +95,7 @@ class RollingCurl {
      * Set your base options that you want to be used with EVERY request.
      */
     protected $options = array(CURLOPT_SSL_VERIFYPEER => 0,
-                             CURLOPT_RETURNTRANSFER => 1,
-                             CURLOPT_FOLLOWLOCATION => 1,
-                             CURLOPT_MAXREDIRS => 5,
+                             CURLOPT_RETURNTRANSFER => 1,                             
                              CURLOPT_CONNECTTIMEOUT => 30,
                              CURLOPT_TIMEOUT => 30);
     /**
@@ -318,11 +318,15 @@ class RollingCurl {
     private function get_options($request) {
         // options for this entire curl object
         $options = $this->__get('options');
+		if (ini_get('safe_mode') == 'Off' || !ini_get('safe_mode')) {
+            $options[CURLOPT_FOLLOWLOCATION] = 1;
+			$options[CURLOPT_MAXREDIRS] = 5;
+        }
         $headers = $this->__get('headers');
 
 		// append custom options for this specific request
 		if ($request->options) {
-            $options = $this->__get('options') + $request->options;
+            $options += $request->options;
         } 
 
 		// set the request URL
