@@ -10,7 +10,29 @@ $Id$
 
 // a little example that fetches a bunch of sites in parallel and echos the page title and response info for each request
 
+function request_callback($response, $info) {
+	// parse the page title out of the returned HTML
+	if (preg_match("~<title>(.*?)</title>~i", $response, $out)) {
+		$title = $out[1];
+	}
+	echo "<b>$title</b><br />";
+	print_r($info);
+	echo "<hr>";
+}
+
 require("RollingCurl.php");
+
+// single curl request
+$rc = new RollingCurl("request_callback");
+$rc->request("http://www.msn.com");
+$rc->execute();
+
+// another single curl request
+$rc = new RollingCurl("request_callback");
+$rc->request("http://www.google.com");
+$rc->execute();
+
+echo "<hr>";
 
 // top 20 sites according to alexa (11/5/09)
 $urls = array("http://www.google.com",
@@ -33,16 +55,6 @@ $urls = array("http://www.google.com",
               "http://www.sina.com.cn",
               "http://www.wordpress.com",
               "http://www.google.co.uk");
-
-function request_callback($response, $info) {
-	// parse the page title out of the returned HTML
-	if (preg_match("~<title>(.*?)</title>~i", $response, $out)) {
-		$title = $out[1];
-	}
-	echo "<b>$title</b><br />";
-	print_r($info);
-	echo "<hr>";
-}
 
 $rc = new RollingCurl("request_callback");
 $rc->window_size = 20;

@@ -76,7 +76,8 @@ class RollingCurl {
     /**
      * @var int
      *
-     * Window_size is the max number of simultaneous connections allowed.
+     * Window size is the max number of simultaneous connections allowed.
+	 * 
      * REMEMBER TO RESPECT THE SERVERS:
      * Sending too many requests at one time can easily be perceived
      * as a DOS attack. Increase this window_size if you are making requests
@@ -96,10 +97,13 @@ class RollingCurl {
      *
      * Set your base options that you want to be used with EVERY request.
      */
-    protected $options = array(CURLOPT_SSL_VERIFYPEER => 0,
-                             CURLOPT_RETURNTRANSFER => 1,
-                             CURLOPT_CONNECTTIMEOUT => 30,
-                             CURLOPT_TIMEOUT => 30);
+    protected $options = array(
+		CURLOPT_SSL_VERIFYPEER => 0,
+        CURLOPT_RETURNTRANSFER => 1,
+        CURLOPT_CONNECTTIMEOUT => 30,
+        CURLOPT_TIMEOUT => 30
+	);
+	
     /**
      * @var array
      */
@@ -226,14 +230,10 @@ class RollingCurl {
      */
     private function single_curl() {
         $ch = curl_init();
-        $options = $this->get_options($this->requests[0]);
+        $options = $this->get_options(array_shift($this->requests));
         curl_setopt_array($ch,$options);
         $output = curl_exec($ch);
         $info = curl_getinfo($ch);
-
-		// remove request from the queue and reindex
-		unset($this->requests[0]);
-		$this->requests = array_values($this->requests);
 
         // it's not neccesary to set a callback for one-off requests
         if ($this->callback) {
