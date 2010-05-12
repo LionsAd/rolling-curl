@@ -4,6 +4,8 @@ authored by Josh Fraser (www.joshfraser.com)
 released under Apache License 2.0
 
 Maintained by Alexander Makarov, http://rmcreative.ru/
+
+$Id$
 */
 
 // a little example that fetches a bunch of sites in parallel and echos the page title and response info for each request

@@ -1,4 +1,5 @@
 RollingCurl was written by Josh Fraser (joshfraser.com) and is released under the Apache License 2.0
+Maintained by Alexander Makarov, http://rmcreative.ru/
 
  == Overview ==
 
@@ -105,3 +106,5 @@ $collector->run(array(
     'http://google.com/',
     'http://yahoo.com/'
 ));
+
+$Id$
