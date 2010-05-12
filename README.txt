@@ -30,7 +30,7 @@ $urls = array("http://www.google.com",
 // a function that will process the returned responses
 function request_callback($response, $info) {
 	// parse the page title out of the returned HTML
-	if (eregi ("<title>(.*)</title>", $response, $out)) {
+	if (preg_match("~<title>(.*?)</title>~i", $response, $out)) {
 		$title = $out[1];
 	}
 	echo "<b>$title</b><br />";
