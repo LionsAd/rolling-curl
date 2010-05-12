@@ -12,10 +12,11 @@ $Id$
  * Class that represent a single curl request
  */
 class Request {
-    /**
-     * Stores the url, method, post_data, headers and options for each request
-     */
-    private $settings = array();
+	public $url = false;
+	public $method = 'GET';
+	public $post_data = null;
+	public $headers = null;
+	public $options = null;
 
     /**
      * @param string $url
@@ -26,40 +27,12 @@ class Request {
      * @return void
      */
     function __construct($url, $method = "GET", $post_data = null, $headers = null, $options = null) {
-        $this->settings['url'] = $url;
-        $this->settings['method'] = $method;
-        $this->settings['post_data'] = $post_data;
-        $this->settings['headers'] = $headers;
-        $this->settings['options'] = $options;
+        $this->url = $url;
+        $this->method = $method;
+        $this->post_data = $post_data;
+        $this->headers = $headers;
+        $this->options = $options;
     }
-
-    /**
-     * @param string $name
-     * @return mixed|bool
-     */
-    public function __get($name) {
-        if (isset($this->settings[$name])) {
-            return $this->settings[$name];
-        }
-        return false;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed $value
-     * @return bool
-     */
-    public function __set($name, $value) {
-        $this->settings[$name] = $value;
-        return true;
-    }
-
-    /**
-     * @return void
-     */
-    public function __destruct() {
-    	unset($this->settings);
-	}
 }
 
 /**
@@ -229,7 +202,7 @@ class RollingCurl {
      * @return string
      */
     private function single_curl() {
-        $ch = curl_init();
+        $ch = curl_init();		
         $options = $this->get_options(array_shift($this->requests));
         curl_setopt_array($ch,$options);
         $output = curl_exec($ch);
@@ -261,14 +234,12 @@ class RollingCurl {
         // make sure the rolling window isn't greater than the # of urls
         if (sizeof($this->requests) < $this->window_size)
             $this->window_size = sizeof($this->requests);
-
-        // window size must be greater than 1
+        
         if ($this->window_size < 2) {
             throw new RollingCurlException("Window size must be greater than 1");
         }
 
-        $master = curl_multi_init();
-        $curl_arr = array();
+        $master = curl_multi_init();        
 
         // start the first batch of requests
         for ($i = 0; $i < $this->window_size; $i++) {
@@ -319,7 +290,7 @@ class RollingCurl {
      * Helper function to set up a new request by setting the appropriate options
      *
      * @access private
-     * @param  $request
+     * @param Request $request
      * @return array
      */
     private function get_options($request) {
