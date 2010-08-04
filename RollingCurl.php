@@ -11,7 +11,7 @@ $Id$
 /**
  * Class that represent a single curl request
  */
-class Request {
+class RollingCurlRequest {
 	public $url = false;
 	public $method = 'GET';
 	public $post_data = null;
@@ -90,14 +90,22 @@ class RollingCurl {
     private $requests = array();
 
     /**
+     * @var RequestMap[]
+     *
+     * Maps handles to request indexes
+     */
+    private $requestMap = array();
+
+    /**
      * @param  $callback
      * Callback function to be applied to each result.
      *
      * Can be specified as 'my_callback_function'
      * or array($object, 'my_callback_method').
      *
-     * Function should take two parameters: $response, $info.
+     * Function should take three parameters: $response, $info, $request.
      * $response is response body, $info is additional curl info.
+     * $request is the original request
      *
      * @return void
      */
@@ -150,7 +158,7 @@ class RollingCurl {
      * @return bool
      */
     public function request($url, $method = "GET", $post_data = null, $headers = null, $options = null) {
-         $this->requests[] = new Request($url, $method, $post_data, $headers, $options);
+         $this->requests[] = new RollingCurlRequest($url, $method, $post_data, $headers, $options);
          return true;
     }
 
@@ -203,7 +211,8 @@ class RollingCurl {
      */
     private function single_curl() {
         $ch = curl_init();		
-        $options = $this->get_options(array_shift($this->requests));
+        $request = array_shift($this->requests);
+        $options = $this->get_options($request);
         curl_setopt_array($ch,$options);
         $output = curl_exec($ch);
         $info = curl_getinfo($ch);
@@ -212,7 +221,7 @@ class RollingCurl {
         if ($this->callback) {
             $callback = $this->callback;
             if (is_callable($this->callback)){
-                call_user_func($callback, $output, $info);
+                call_user_func($callback, $output, $info, $request);
             }
         }
 		else
@@ -249,6 +258,10 @@ class RollingCurl {
 
             curl_setopt_array($ch,$options);
             curl_multi_add_handle($master, $ch);
+
+            // Add to our request Maps
+            $key = (string) $ch;
+            $this->requestMap[$key] = $i;
         }
 
         do {
@@ -265,15 +278,23 @@ class RollingCurl {
                 // send the return values to the callback function.
                 $callback = $this->callback;
                 if (is_callable($callback)){
-                    call_user_func($callback, $output, $info);
+	            $key = (string)$done['handle'];
+                    $request = $this->requests[$this->requestMap[$key]];
+                    unset($this->requestMap[$key]);
+                    call_user_func($callback, $output, $info, $request);
                 }
 
                 // start a new request (it's important to do this before removing the old one)
                 if ($i < sizeof($this->requests) && isset($this->requests[$i]) && $i < count($this->requests)) {
                     $ch = curl_init();
-                    $options = $this->get_options($this->requests[$i++]);
+                    $options = $this->get_options($this->requests[$i]);
                     curl_setopt_array($ch,$options);
                     curl_multi_add_handle($master, $ch);
+
+                    // Add to our request Maps
+                    $key = (string) $ch;
+                    $this->requestMap[$key] = $i;
+                    $i++;
                 }
 
                 // remove the curl handle that just completed
