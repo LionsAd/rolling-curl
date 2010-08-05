@@ -240,6 +240,7 @@ class RollingCurl {
         }
 		else
             return $output;
+	return true;
     }
 
     /**
