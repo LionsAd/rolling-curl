@@ -33,6 +33,13 @@ class RollingCurlRequest {
         $this->headers = $headers;
         $this->options = $options;
     }
+
+    /**
+     * @return void
+     */
+    public function __destruct() {
+        unset($this->url, $this->method, $this->post_data, $this->headers, $this->options);
+    }
 }
 
 /**
