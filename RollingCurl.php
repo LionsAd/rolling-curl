@@ -66,6 +66,13 @@ class RollingCurl {
     private $window_size = 5;
 
     /**
+     * @var float
+     *
+     * Timeout is the timeout used for curl_multi_select.
+     */
+    private $timeout = 10;
+
+    /**
      * @var string|array
      *
      * Callback function to be applied to each result.
@@ -308,6 +315,11 @@ class RollingCurl {
                 curl_multi_remove_handle($master, $done['handle']);
 
             }
+
+	    // Block for data in / output; error handling is done by curl_multi_exec
+	    if ($running)
+                curl_multi_select($master, $this->timeout);
+
         } while ($running);
         curl_multi_close($master);
         return true;
