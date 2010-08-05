@@ -129,7 +129,7 @@ class RollingCurl {
     public function __set($name, $value){
         // append the base options & headers
         if ($name == "options" || $name == "headers") {
-            $this->{$name} = $this->{$name} + $value;
+            $this->{$name} = $value + $this->{$name};
         } else {
             $this->{$name} = $value;
         }
