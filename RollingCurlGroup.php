@@ -75,6 +75,11 @@ class RollingCurlGroup
                         $this->num_requests++;
                         $this->requests[] = $request;
                 }
+		else if (is_array($request))
+                {
+			foreach ($request as $req)
+				$this->add($req);
+		}
                 else
                         throw new RollingCurlGroupException("add: Request needs to be of instance RollingCurlGroupRequest");
 
