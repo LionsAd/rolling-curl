@@ -144,5 +144,14 @@ class GroupRollingCurl extends RollingCurl {
 		else
 			return parent::add($request);
 	}
+
+	public function execute($window_size = null) {
+
+		if (count($this->requests) == 0)
+			return false;
+
+		return parent::execute($window_size);
+	}
+
 }
 
