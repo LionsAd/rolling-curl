@@ -345,7 +345,7 @@ class RollingCurl {
 
 		// append custom options for this specific request
 		if ($request->options) {
-            $options += $request->options;
+            $options = $request->options + $options;
         }
 
 		// set the request URL

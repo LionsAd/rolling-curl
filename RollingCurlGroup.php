@@ -75,6 +75,11 @@ class RollingCurlGroup
                         $this->num_requests++;
                         $this->requests[] = $request;
                 }
+		else if (is_array($request))
+                {
+			foreach ($request as $req)
+				$this->add($req);
+		}
                 else
                         throw new RollingCurlGroupException("add: Request needs to be of instance RollingCurlGroupRequest");
 
@@ -139,5 +144,14 @@ class GroupRollingCurl extends RollingCurl {
 		else
 			return parent::add($request);
 	}
+
+	public function execute($window_size = null) {
+
+		if (count($this->requests) == 0)
+			return false;
+
+		return parent::execute($window_size);
+	}
+
 }
 
