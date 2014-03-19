@@ -24,8 +24,7 @@ The result is a faster and more efficient way of processing large quantities of 
 ###Example 1 - Hello world:
 an array of URL's to fetch
 
-```
-
+```php
 $urls = array("http://www.google.com",
               "http://www.facebook.com",
               "http://www.yahoo.com");
@@ -66,7 +65,7 @@ $rc->execute();
 
 Set custom options for EVERY request:
 
-```
+```php
 $rc = new RollingCurl("request_callback");
 $rc->options = array(CURLOPT_HEADER => true, CURLOPT_NOBODY => true); 
 $rc->execute();
@@ -83,7 +82,7 @@ $rc->execute();
 
 ###Example 3 - Shortcuts:
 
-```
+```php
 $rc = new RollingCurl("request_callback");
 $rc->get("http://www.google.com");
 $rc->get("http://www.yahoo.com");
@@ -92,7 +91,7 @@ $rc->execute();
 
 ###Example 4 - Class callbacks:
 
-```
+```php
 class MyInfoCollector {
     private $rc;
 
