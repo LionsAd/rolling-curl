@@ -59,7 +59,7 @@ $urls = array("http://www.google.com",
 $rc = new RollingCurl("request_callback");
 $rc->window_size = 20;
 foreach ($urls as $url) {
-    $request = new Request($url);
+    $request = new RollingCurlRequest($url);
     $rc->add($request);
 }
 $rc->execute();
