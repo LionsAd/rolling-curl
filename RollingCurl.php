@@ -111,6 +111,13 @@ class RollingCurl {
     private $requestMap = array();
 
     /**
+     * @var returns[]
+     *
+     * All returns of requests
+     */
+    private $returns = array();
+
+    /**
      * @param  $callback
      * Callback function to be applied to each result.
      *
@@ -159,6 +166,22 @@ class RollingCurl {
     public function add($request) {
          $this->requests[] = $request;
          return true;
+    }
+
+    /**
+     * @param \returns[] $returns
+     */
+    public function setReturns($returns)
+    {
+        $this->returns = $returns;
+    }
+
+    /**
+     * @return \returns[]
+     */
+    public function getReturns()
+    {
+        return $this->returns;
     }
 
     /**
@@ -281,14 +304,20 @@ class RollingCurl {
 
         do {
             while(($execrun = curl_multi_exec($master, $running)) == CURLM_CALL_MULTI_PERFORM);
-            if($execrun != CURLM_OK)
+            if($execrun != CURLM_OK) {
                 break;
+            }
             // a request was just completed -- find out which one
             while($done = curl_multi_info_read($master)) {
 
                 // get the info and content returned on the request
                 $info = curl_getinfo($done['handle']);
                 $output = curl_multi_getcontent($done['handle']);
+
+                array_push($this->returns, array(
+                    'return'    =>  $output,
+                    'info'      =>  $info,
+                ));
 
                 // send the return values to the callback function.
                 $callback = $this->callback;
@@ -317,9 +346,10 @@ class RollingCurl {
 
             }
 
-	    // Block for data in / output; error handling is done by curl_multi_exec
-	    if ($running)
+            // Block for data in / output; error handling is done by curl_multi_exec
+            if ($running) {
                 curl_multi_select($master, $this->timeout);
+            }
 
         } while ($running);
         curl_multi_close($master);
@@ -337,7 +367,11 @@ class RollingCurl {
     private function get_options($request) {
         // options for this entire curl object
         $options = $this->__get('options');
-		if (ini_get('safe_mode') == 'Off' || !ini_get('safe_mode')) {
+        // NOTE: The PHP cURL library won't follow redirects if either safe_mode is on
+        // or open_basedir is defined.
+        // See: https://bugs.php.net/bug.php?id=30609
+		if (( ini_get('safe_mode') == 'Off' || !ini_get('safe_mode') )
+            && ini_get('open_basedir') == '') {
             $options[CURLOPT_FOLLOWLOCATION] = 1;
 			$options[CURLOPT_MAXREDIRS] = 5;
         }
@@ -359,6 +393,15 @@ class RollingCurl {
         if ($headers) {
             $options[CURLOPT_HEADER] = 0;
             $options[CURLOPT_HTTPHEADER] = $headers;
+        }
+        
+        // Due to a bug in cURL CURLOPT_WRITEFUNCTION must be defined as the last option
+        // Otherwise it doesn't register. So let's unset and set it again
+        // See http://stackoverflow.com/questions/15937055/curl-writefunction-not-being-called
+        if( ! empty( $options[CURLOPT_WRITEFUNCTION]) ) {
+            $writeCallback = $options[CURLOPT_WRITEFUNCTION];
+            unset( $options[CURLOPT_WRITEFUNCTION] );
+            $options[CURLOPT_WRITEFUNCTION] = $writeCallback;
         }
 
         return $options;
