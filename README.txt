@@ -44,7 +44,7 @@ $rc = new RollingCurl("request_callback");
 $rc->window_size = 20;
 foreach ($urls as $url) {
     // add each request to the RollingCurl object
-    $request = new Request($url);
+    $request = new RollingCurlRequest($url);
     $rc->add($request);
 }
 $rc->execute();
@@ -64,7 +64,7 @@ $rc->execute();
 Set custom options for A SINGLE request:
 
 $rc = new RollingCurl("request_callback");
-$request = new Request($url);
+$request = new RollingCurlRequest($url);
 $request->options = array(CURLOPT_HEADER => true, CURLOPT_NOBODY => true); 
 $rc->add($request);
 $rc->execute();
@@ -94,7 +94,7 @@ class MyInfoCollector {
 
     function run($urls){
         foreach ($urls as $url){
-            $request = new Request($url);
+            $request = new RollingCurlRequest($url);
             $this->rc->add($request);
         }
         $this->rc->execute();
