@@ -111,13 +111,6 @@ class RollingCurl {
     private $requestMap = array();
 
     /**
-     * @var returns[]
-     *
-     * All returns of requests
-     */
-    private $returns = array();
-
-    /**
      * @param  $callback
      * Callback function to be applied to each result.
      *
@@ -166,22 +159,6 @@ class RollingCurl {
     public function add($request) {
          $this->requests[] = $request;
          return true;
-    }
-
-    /**
-     * @param \returns[] $returns
-     */
-    public function setReturns($returns)
-    {
-        $this->returns = $returns;
-    }
-
-    /**
-     * @return \returns[]
-     */
-    public function getReturns()
-    {
-        return $this->returns;
     }
 
     /**
@@ -313,11 +290,6 @@ class RollingCurl {
                 // get the info and content returned on the request
                 $info = curl_getinfo($done['handle']);
                 $output = curl_multi_getcontent($done['handle']);
-
-                array_push($this->returns, array(
-                    'return'    =>  $output,
-                    'info'      =>  $info,
-                ));
 
                 // send the return values to the callback function.
                 $callback = $this->callback;
