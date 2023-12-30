@@ -235,7 +235,7 @@ class RollingCurl {
         if ($this->callback) {
             $callback = $this->callback;
             if (is_callable($this->callback)){
-                call_user_func($callback, $output, $info, $request);
+                call_user_func($callback, $output, $info, $request,$this->get_options($this->requests[$i]));
             }
         }
 		else
@@ -296,7 +296,7 @@ class RollingCurl {
 	            $key = spl_object_id($done['handle']);
                     $request = $this->requests[$this->requestMap[$key]];
                     unset($this->requestMap[$key]);
-                    call_user_func($callback, $output, $info, $request);
+                    call_user_func($callback, $output, $info, $request,$this->get_options($this->requests[$i]));
                 }
 
                 // start a new request (it's important to do this before removing the old one)
