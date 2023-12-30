@@ -17,6 +17,7 @@ class RollingCurlRequest {
 	public $post_data = null;
 	public $headers = null;
 	public $options = null;
+	public $context = null;
 
     /**
      * @param string $url
@@ -26,19 +27,20 @@ class RollingCurlRequest {
      * @param  $options
      * @return void
      */
-    function __construct($url, $method = "GET", $post_data = null, $headers = null, $options = null) {
+    function __construct($url, $method = "GET", $post_data = null, $headers = null, $options = null, $context = null) {
         $this->url = $url;
         $this->method = $method;
         $this->post_data = $post_data;
         $this->headers = $headers;
         $this->options = $options;
+		$this->context = $context;
     }
 
     /**
      * @return void
      */
     public function __destruct() {
-        unset($this->url, $this->method, $this->post_data, $this->headers, $this->options);
+        unset($this->url, $this->method, $this->post_data, $this->headers, $this->options, $this->context);
     }
 }
 
@@ -171,8 +173,8 @@ class RollingCurl {
      * @param  $options
      * @return bool
      */
-    public function request($url, $method = "GET", $post_data = null, $headers = null, $options = null) {
-         $this->requests[] = new RollingCurlRequest($url, $method, $post_data, $headers, $options);
+    public function request($url, $method = "GET", $post_data = null, $headers = null, $options = null, $context = null) {
+         $this->requests[] = new RollingCurlRequest($url, $method, $post_data, $headers, $options, $context);
          return true;
     }
 
@@ -184,8 +186,8 @@ class RollingCurl {
      * @param  $options
      * @return bool
      */
-    public function get($url, $headers = null, $options = null) {
-        return $this->request($url, "GET", null, $headers, $options);
+    public function get($url, $headers = null, $options = null, $context = null) {
+        return $this->request($url, "GET", null, $headers, $options, $context);
     }
 
     /**
@@ -197,8 +199,8 @@ class RollingCurl {
      * @param  $options
      * @return bool
      */
-    public function post($url, $post_data = null, $headers = null, $options = null) {
-        return $this->request($url, "POST", $post_data, $headers, $options);
+    public function post($url, $post_data = null, $headers = null, $options = null, $context = null) {
+        return $this->request($url, "POST", $post_data, $headers, $options, $context);
     }
 
     /**
