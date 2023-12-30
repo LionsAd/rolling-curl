@@ -275,7 +275,7 @@ class RollingCurl {
             curl_multi_add_handle($master, $ch);
 
             // Add to our request Maps
-            $key = (string) $ch;
+            $key = spl_object_id($ch);
             $this->requestMap[$key] = $i;
         }
 
@@ -293,7 +293,7 @@ class RollingCurl {
                 // send the return values to the callback function.
                 $callback = $this->callback;
                 if (is_callable($callback)){
-	            $key = (string)$done['handle'];
+	            $key = spl_object_id($done['handle']);
                     $request = $this->requests[$this->requestMap[$key]];
                     unset($this->requestMap[$key]);
                     call_user_func($callback, $output, $info, $request);
@@ -307,7 +307,7 @@ class RollingCurl {
                     curl_multi_add_handle($master, $ch);
 
                     // Add to our request Maps
-                    $key = (string) $ch;
+                    $key = spl_object_id($ch);
                     $this->requestMap[$key] = $i;
                     $i++;
                 }
