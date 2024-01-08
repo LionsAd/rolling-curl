@@ -294,17 +294,17 @@ class RollingCurl {
 
                 // send the return values to the callback function.
                 $callback = $this->callback;
+				$options = $this->get_options($this->requests[$i]);
                 if (is_callable($callback)){
-	            $key = spl_object_id($done['handle']);
+	                $key = spl_object_id($done['handle']);
                     $request = $this->requests[$this->requestMap[$key]];
                     unset($this->requestMap[$key]);
-                    call_user_func($callback, $output, $info, $request,$this->get_options($this->requests[$i]));
+                    call_user_func($callback, $output, $info, $request,$options);
                 }
 
                 // start a new request (it's important to do this before removing the old one)
                 if ($i < sizeof($this->requests) && isset($this->requests[$i]) && $i < count($this->requests)) {
                     $ch = curl_init();
-                    $options = $this->get_options($this->requests[$i]);
                     curl_setopt_array($ch,$options);
                     curl_multi_add_handle($master, $ch);
 
