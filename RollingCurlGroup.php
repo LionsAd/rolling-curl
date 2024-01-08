@@ -11,31 +11,31 @@ class RollingCurlGroupException extends Exception {}
 
 abstract class RollingCurlGroupRequest extends RollingCurlRequest
 {
-        private $group = null;
+		private $group = null;
 
 	/**
 	 * Set group for this request
 	 *
 	 * @param group The group to be set
 	 */
-        function setGroup($group)
-        {
-                if (!($group instanceof RollingCurlGroup))
-                        throw new RollingCurlGroupException("setGroup: group needs to be of instance RollingCurlGroup");
+		function setGroup($group)
+		{
+				if (!($group instanceof RollingCurlGroup))
+						throw new RollingCurlGroupException("setGroup: group needs to be of instance RollingCurlGroup");
 
-                $this->group = $group;
-        }
+				$this->group = $group;
+		}
 
 	/**
 	 * Process the request
 	 *
 	 *
 	 */
-        function process($output, $info)
-        {
-                if ($this->group)
-                        $this->group->process($output, $info, $this);
-        }
+		function process($output, $info)
+		{
+				if ($this->group)
+						$this->group->process($output, $info, $this);
+		}
 
 	/**
 	 * @return void
@@ -49,15 +49,15 @@ abstract class RollingCurlGroupRequest extends RollingCurlRequest
 
 class RollingCurlGroup
 {
-        protected $name;
-        protected $num_requests = 0;
-        protected $finished_requests = 0;
-        private $requests = array();
+		protected $name;
+		protected $num_requests = 0;
+		protected $finished_requests = 0;
+		private $requests = array();
 
-        function __construct($name)
-        {
-                $this->name = $name;
-        }
+		function __construct($name)
+		{
+				$this->name = $name;
+		}
 
 	/**
 	 * @return void
@@ -67,33 +67,33 @@ class RollingCurlGroup
 	}
 
 
-        function add($request)
-        {
-                if ($request instanceof RollingCurlGroupRequest)
-                {
-                        $request->setGroup($this);
-                        $this->num_requests++;
-                        $this->requests[] = $request;
-                }
+		function add($request)
+		{
+				if ($request instanceof RollingCurlGroupRequest)
+				{
+						$request->setGroup($this);
+						$this->num_requests++;
+						$this->requests[] = $request;
+				}
 		else if (is_array($request))
-                {
+				{
 			foreach ($request as $req)
 				$this->add($req);
 		}
-                else
-                        throw new RollingCurlGroupException("add: Request needs to be of instance RollingCurlGroupRequest");
+				else
+						throw new RollingCurlGroupException("add: Request needs to be of instance RollingCurlGroupRequest");
 
 		return true;
-        }
+		}
 
-        function addToRC($rc)
-        {
+		function addToRC($rc)
+		{
 		$ret = true;
 
-                if (!($rc instanceof RollingCurl))
-                        throw new RollingCurlGroupException("addToRC: RC needs to be of instance RollingCurl");
+				if (!($rc instanceof RollingCurl))
+						throw new RollingCurlGroupException("addToRC: RC needs to be of instance RollingCurl");
 
-                while (count($this->requests) > 0)
+				while (count($this->requests) > 0)
 		{
 			$ret1 = $rc->add(array_shift($this->requests));
 			if (!$ret1)
@@ -101,19 +101,19 @@ class RollingCurlGroup
 		}
 
 		return $ret;
-        }
+		}
 
-        function process($output, $info, $request)
-        {
-                $this->finished_requests++;
+		function process($output, $info, $request)
+		{
+				$this->finished_requests++;
 
-                if ($this->finished_requests >= $this->num_requests)
-                        $this->finished();
-        }
+				if ($this->finished_requests >= $this->num_requests)
+						$this->finished();
+		}
 
-        function finished()
-        {
-        }
+		function finished()
+		{
+		}
 
 }
 
